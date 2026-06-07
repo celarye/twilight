@@ -151,12 +151,27 @@ impl ClientBuilder {
 }
 
 impl Default for ClientBuilder {
+    #[cfg(not(target_os = "wasi"))]
     fn default() -> Self {
         Self {
             default_allowed_mentions: None,
             default_headers: None,
             proxy: None,
             ratelimiter: (!cfg!(test)).then(RateLimiter::default),
+            remember_invalid_token: true,
+            timeout: Duration::from_secs(10),
+            token: None,
+            use_http: false,
+        }
+    }
+
+    #[cfg(target_os = "wasi")]
+    fn default() -> Self {
+        Self {
+            default_allowed_mentions: None,
+            default_headers: None,
+            proxy: None,
+            ratelimiter: None,
             remember_invalid_token: true,
             timeout: Duration::from_secs(10),
             token: None,
